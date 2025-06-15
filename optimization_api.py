@@ -124,10 +124,7 @@ if __name__ == "__main__":
     X_train, y_train, X_val, y_val, model, vectorizer = load_data_and_model()
     
     # Optimize model
-    optimized_model = optimize_model(X_train, y_train, X_val, y_val)
-    
-    # Update global model for API
-    model = optimized_model
+    model = optimize_model(X_train, y_train, X_val, y_val)
     
     # Run Flask API
     app.run(debug=True, host='0.0.0.0', port=5000)
