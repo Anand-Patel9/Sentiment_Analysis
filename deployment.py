@@ -21,34 +21,25 @@ def serve_interface():
     except FileNotFoundError:
         return jsonify({'error': 'Web interface file not found'}), 404
 
-@app.route('/predict', methods=['POST'])
-def predict():
-    try:
-        data = request.get_json(force=True)
-        text = data.get('text', '')
-        if not text:
-            return jsonify({'error': 'No text provided'}), 400
-        
-        # Preprocess input text
-        processed_text = preprocess_text(text)
-        X = vectorizer.transform([processed_text])
-        
-        # Predict sentiment
-        prediction = model.predict(X)[0]
-        sentiment = 'Positive' if prediction == 1 else 'Negative' if prediction == -1 else 'Neutral'
-        
-        return jsonify({'sentiment': sentiment, 'prediction': int(prediction)})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
 if __name__ == "__main__":
     # Ensure required files exist
-    if not os.path.exists('models/optimized_model.pkl') or not os.path.exists('data/vectorizer.pkl') or not os.path.exists('week5_web_interface.html'):
-        print("Error: Required files (optimized_model.pkl, vectorizer.pkl, or week5_web_interface.html) not found.")
-        exit(1)
+    required_files = [
+        'models/optimized_model.pkl',
+        'data/vectorizer.pkl',
+        'web_interface.html'
+    ]
+    for file_path in required_files:
+        if not os.path.exists(file_path):
+            print(f"Error: Required file {file_path} not found.")
+            exit(1)
     
     # Load model and vectorizer
+    global model, vectorizer
     model, vectorizer = load_model_and_vectorizer()
     
+    # Print registered routes for debugging
+    print("Registered routes:", [rule.rule for rule in app.url_map.iter_rules()])
+    
     # Run Flask app
+    print("Starting Flask application...")
     app.run(debug=True, host='0.0.0.0', port=5000)
